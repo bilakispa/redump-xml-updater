@@ -8,7 +8,8 @@ import socketserver
 
 #Config
 userinfo_filename = 'UserInfo.xml'
-url_main = 'http://redump.org/'
+url_home = 'http://redump.org/'
+url_downloads = 'http://redump.org/downloads/'
 url_login = 'http://forum.redump.org/login/'
 regex = {
 	'datfile' : r'<a href="/datfile/(.*?)">',
@@ -58,7 +59,7 @@ def Update_XML():
 		#Send a POST request to login
 		payload = {
 			'form_sent' : '1',
-			'redirect_url' : url_main,
+			'redirect_url' : url_downloads,
 			'csrf_token' : csrf_token,
 			'req_username' : username,
 			'req_password' : password,
@@ -75,7 +76,7 @@ def Update_XML():
 			sys.exit(1)
 	else:
 		try:
-			result = client.get(url_main)
+			result = client.get(url_downloads)
 		except requests.exceptions.RequestException as e:
 			print ('Error: ')
 			print (e)
@@ -89,7 +90,7 @@ def Update_XML():
 	datInfo = []
 	dict = {}
 	for dat in datFiles:
-		response = client.head(url_main+'datfile/'+dat)
+		response = client.head(url_home+'datfile/'+dat)
 		content_header = response.headers['Content-Disposition']
 		
 		#get the date from the file name
@@ -154,4 +155,3 @@ try:
 		Start_Server()
 except KeyboardInterrupt:
 	pass
-	
