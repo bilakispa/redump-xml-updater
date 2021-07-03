@@ -7,8 +7,8 @@ Checks for the newest .dat files on redump.org and inserts them into a xml file 
 2. requests module (pip3 install requests)
 
 ## How to use
-1. Edit the UserInfo.xml file with log-in data (if you have)
-2. Run the script, if you chose the first option it will update the xml and start a local server too.
+1. Edit the **UserInfo.xml** file with log-in data (if you have)
+2. Run the script (**redump-xml-updater.py**), if you chose the first option it will update the xml and start a local server too.
 3. Add the site into clrmamepro's _WWW Profiler_
 * Example configuration:
 > URL of Dat: 127.0.0.1:8668/profile.xml
