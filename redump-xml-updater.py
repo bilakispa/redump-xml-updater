@@ -5,6 +5,9 @@ import re
 import requests
 import http.server
 import socketserver
+import time
+
+BASEPATH = os.path.abspath(os.path.dirname(__file__))
 
 #Config
 userinfo_filename = 'UserInfo.xml'
@@ -24,6 +27,8 @@ server_address = '127.0.0.1'
 server_port = 8668
 
 def Update_XML():
+	xml_fullpath = os.path.join(BASEPATH,xml_filename)
+
 	print('Updating XML:')
 	print(' * Retrieving site info', end=' ')
 	sys.stdout.flush()
@@ -117,9 +122,8 @@ def Update_XML():
 		datInfo.append(dict.copy())
 	
 	print('(DONE)')
-	print(' * Writing to ' + xml_filename, end=' ')
+	print(' * Writing to ' + xml_fullpath, end=' ')
 	sys.stdout.flush()
-	
 	tag_clrmamepro = ET.Element('clrmamepro')
 	for info in datInfo:
 		tag_datfile = ET.SubElement(tag_clrmamepro, 'datfile')
@@ -132,23 +136,31 @@ def Update_XML():
 		ET.SubElement(tag_datfile, 'file').text = info['File']
 		
 	xmldata = ET.tostring(tag_clrmamepro).decode()
-	xmlfile = open(xml_filename, 'w')
-	xmlfile.write(xmldata)
-	print('(DONE)')
-
+	try:
+		xmlfile = open(xml_fullpath, 'w')
+		xmlfile.write(xmldata)
+		print('(DONE)')
+	except OSError:
+		print("")
+		print("[ERROR] Could not open/read file:", xml_fullpath)
+	except Exception as err:
+		print("")
+		print(f"[ERROR] Unexpected error opening {xml_fullpath}:", repr(err))
+	
 def Start_Server():
 	print('Starting Local Server:')
 	Handler = http.server.SimpleHTTPRequestHandler
 	with socketserver.TCPServer((server_address, server_port), Handler) as httpd:
-		print('Serving HTTP on ' + server_address + ' port ' + str(server_port) + ' (http://'+server_address+':'+str(server_port)+'/) ...')
+		print('Serving HTTP on ' + server_address + ' port ' + str(server_port) + ' (http://'+server_address+':'+str(server_port)+'/)... ([ctrl+c] to terminate)')
 		try:
 			httpd.serve_forever()
 		except KeyboardInterrupt:
-			print('Terminating server ...')
+			print('Terminating server', end=' ')
 		finally:
 			# Clean-up server (close socket, etc.)
 			httpd.shutdown()
 			httpd.server_close()
+			print('(DONE)')
 
 print('Welcome to Redump.org XML updater [Github: bilakispa/redump-xml-updater]')
 try:
@@ -165,3 +177,7 @@ try:
 		Start_Server()
 except KeyboardInterrupt:
 	pass
+	
+print("")
+print("Terminating script in 5 seconds...")
+time.sleep(5)
